@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Casedetail</title>
+    <link rel="stylesheet" href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdn.bootcss.com/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <style type="text/css">
+        .border {
+            border: 1px ridge skyblue;
+            background-color: darkgray;
+            color: #FFFFFF;
+        }
+
+        .container {
+            padding-right: 15px;
+            padding-left: 15px;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        li {
+            cursor: pointer;
+            font-weight: bold;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            -o-text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    </style>
+
+</head>
+<body>
+<div class="text-center border" style="width: 100%;background-color: skyblue">
+    <h1>Case详情</h1>
+</div>
+
+
+<div id="content" class="row-fluid">
+
+    <div class="col-md-3 border">
+        <h3 style="margin-left: 14px">用例类名</h3>
+        <ul class="ul nav nav-pills nav-stacked" id="casename"></ul>
+    </div>
+
+    <div class="col-md-9">
+        <h3 id="title" style="margin-left: 15px">具体内容</h3>
+
+        <div class="container">
+            <table style="width:85%" class="table table-striped table-hover table-bordered" id="show">
+                <thead>
+                <tr class="info">
+                    <th>方法</th>
+                    <th>描述</th>
+                    <th>开始时间</th>
+                    <th>耗时</th>
+                </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $.get('./test.json').done(function (data) {
+            for (var d in data) {
+                $('#casename').append('<li><a>'+data[d].name.substring(26) + '</a ></li>');
+            }
+            $('li').on('click', function () {
+                $("#show  tr:not(:first)").empty("");
+                var cname = (this.innerText).replace(/[\r\n]/g, "");
+                $("#title").text("具体内容:"+"com.maoyan.xuanwu.apitest."+cname);
+                var destArr = data.filter(function (p) {
+                    return p.name == "com.maoyan.xuanwu.apitest."+cname;
+                });
+                var contentArr = destArr[0].detail;
+                for (var i in contentArr) {
+                    if (contentArr[i].status == "failure") {
+                        $('#show').append("<tr class=\"danger\">" + "<td>" + contentArr[i].method + "</td>" + "<td>" + contentArr[i].desc + "</td>" +
+                            "<td>" + contentArr[i].starttime + "</td>" + "<td>" + contentArr[i].cost + "</td>" + "<tr>" + "<tr>" + "<td class=\"danger\" colspan='4'>" +
+                            "<span class=\"badge pull-right\" style='background-color:crimson'>" + "ERROR" + "</span>" + "<div style='height: 20px;overflow: hidden;cursor: pointer;' onclick='extend(this)'>"
+                            + contentArr[i].content + "</div>" + "</td>" + "</tr>");
+                    }
+                    else {
+                        $('#show').append("<tr class=\"success\">" + "<td>" + contentArr[i].method + "</td>" + "<td>" + contentArr[i].desc + "</td>" +
+                            "<td>" + contentArr[i].starttime + "</td>" + "<td>" + contentArr[i].cost + "</td>" + "<tr>" +
+                            "<tr>" + "<td colspan='4'><div style='height: 20px;overflow: hidden;cursor: pointer;' onclick='extend(this)'>"
+                            + contentArr[i].content + "</div></td>" + "</tr>");
+                    }
+                }
+            });
+        });
+    })
+    function extend(x) {
+        x.style.height == "auto" ? x.style.height = "20px" : x.style.height = "auto";
+    }
+</script>
+
+
+</body>
+</html>
